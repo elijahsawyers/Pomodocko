@@ -7,8 +7,13 @@
 
 import Cocoa
 
+/// Handles the creation of app icons by layering images over one another.
 class AppIconFactory {
 
+    /// Create an app icon by composing the images with the given names.
+    ///
+    /// - Returns: The composed app icon (`NSImage`) is returned, but if any of the names are invalid, `nil` is returned.
+    /// - Note: The images are composed in the order in which they're given (left-to-right).
     static func createIcon(withImagesNamed imageNames: [String]) -> NSImage? {
         guard imageNames.count > 1 else { return NSImage(named: imageNames.first!) }
 
@@ -29,6 +34,7 @@ class AppIconFactory {
         return result
     }
 
+    /// Layer `image` over `background` and return the result.
     private static func compose(image: NSImage, over background: NSImage) -> NSImage? {
         guard let background = background.ciImage else { return nil }
         guard let image = image.ciImage else { return nil }
@@ -42,10 +48,15 @@ class AppIconFactory {
 
 }
 
+// MARK: NSImage+CIImage Extension[s]
+
 extension NSImage {
+
+    /// Convert `NSImage` to `CIImage`.
     var ciImage: CIImage? {
         guard let tiffRepresentation = tiffRepresentation else { return nil }
         guard let bitmap = NSBitmapImageRep(data: tiffRepresentation) else { return nil }
         return CIImage(bitmapImageRep: bitmap)
     }
+
 }

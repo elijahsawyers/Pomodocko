@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E724F98E2735DDEA00BC6800 /* AppDelegate+DockMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = E724F98D2735DDEA00BC6800 /* AppDelegate+DockMenu.swift */; };
 		E72E130B27335AD4005D6E5E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72E130A27335AD4005D6E5E /* AppDelegate.swift */; };
 		E72E130F27335AD6005D6E5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E72E130E27335AD6005D6E5E /* Assets.xcassets */; };
 		E72E131A27335C98005D6E5E /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72E131927335C98005D6E5E /* main.swift */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E724F98D2735DDEA00BC6800 /* AppDelegate+DockMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+DockMenu.swift"; sourceTree = "<group>"; };
 		E72E130727335AD4005D6E5E /* Pomodocko.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pomodocko.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E72E130A27335AD4005D6E5E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E72E130E27335AD6005D6E5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -57,9 +59,10 @@
 			isa = PBXGroup;
 			children = (
 				E72E130A27335AD4005D6E5E /* AppDelegate.swift */,
+				E724F98D2735DDEA00BC6800 /* AppDelegate+DockMenu.swift */,
+				E72E131F27348C68005D6E5E /* AppIconFactory.swift */,
 				E72E131D27336A2A005D6E5E /* PomodockoController.swift */,
 				E72E131B27335E36005D6E5E /* PomodoroTimer.swift */,
-				E72E131F27348C68005D6E5E /* AppIconFactory.swift */,
 				E72E131927335C98005D6E5E /* main.swift */,
 				E72E130E27335AD6005D6E5E /* Assets.xcassets */,
 				E72E131327335AD6005D6E5E /* Pomodocko.entitlements */,
@@ -137,6 +140,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E72E131C27335E36005D6E5E /* PomodoroTimer.swift in Sources */,
+				E724F98E2735DDEA00BC6800 /* AppDelegate+DockMenu.swift in Sources */,
 				E72E130B27335AD4005D6E5E /* AppDelegate.swift in Sources */,
 				E72E132027348C68005D6E5E /* AppIconFactory.swift in Sources */,
 				E72E131E27336A2A005D6E5E /* PomodockoController.swift in Sources */,
