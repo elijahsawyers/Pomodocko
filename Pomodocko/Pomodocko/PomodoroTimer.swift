@@ -47,7 +47,7 @@ class PomodoroTimer: NSObject {
     @objc dynamic private(set) var state: State = .inFocus
 
     /// The number of pomodoros that have been completed during the day.
-    private(set) var completedPomodoros = 0
+    @objc dynamic private(set) var completedPomodoros = 0
 
     /// How long, in minutes, the "focus" time is.
     var focusMinutes: FocusMinutes = .twentyFive

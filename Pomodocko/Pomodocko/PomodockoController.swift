@@ -12,8 +12,8 @@ class PomodockoController: NSObject {
 
     // MARK: - Private Instance Var[s]
 
-    /// Stores the observer of changes to the pomodoro timer's iterations.
-    private var observer: NSKeyValueObservation?
+    /// Stores the observer of changes to the pomodoro timer's iterations and completed pomodoros.
+    private var observers: Set<NSKeyValueObservation>
 
     // MARK: - Public Instance Var[s]
 
@@ -23,16 +23,27 @@ class PomodockoController: NSObject {
     // MARK: - Initializer[s] and Deinitializer
 
     override init() {
+        observers = []
         timer = PomodoroTimer()
         super.init()
         setAppIcon(minutes: timer.minutes, seconds: timer.seconds)
-        observer = observe(\.timer.iterations) { [unowned self] _, _ in
+        setAppBadge(to: timer.completedPomodoros)
+
+        // Respond to changes to the number of iterations left in the cycle (break or focus).
+        observers.insert(observe(\.timer.iterations) { [unowned self] _, _ in
             self.setAppIcon(minutes: self.timer.minutes, seconds: self.timer.seconds)
-        }
+        })
+
+        // Respond to changes to the number of completed pomodoro cycles.
+        observers.insert(observe(\.timer.completedPomodoros) { [unowned self] _, _ in
+            self.setAppBadge(to: self.timer.completedPomodoros)
+        })
     }
 
     deinit {
-        observer?.invalidate()
+        for observer in observers {
+            observer.invalidate()
+        }
     }
 
     // MARK: - Private Instance Method[s]
@@ -43,8 +54,14 @@ class PomodockoController: NSObject {
             "clock",
             "\(minutes)_minutes",
             "\(seconds)_seconds",
-            "lines_through_digits"
+            "lines_through_digits",
+            timer.state == .inFocus ? "focus" : "break"
         ])
+    }
+
+    /// Change the app's badge number.
+    private func setAppBadge(to value: Int) {
+        NSApplication.shared.dockTile.badgeLabel = "\(value)"
     }
 
     // MARK: - User Intent[s] (Target-Actions)
