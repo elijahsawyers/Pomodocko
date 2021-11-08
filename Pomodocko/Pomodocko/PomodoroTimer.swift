@@ -41,13 +41,13 @@ class PomodoroTimer: NSObject {
     // MARK: - Public Instance Var[s]
 
     /// How many iterations (seconds) are left in the pomodoro cycle.
-    @objc dynamic lazy private(set) var iterations  = focusMinutes.rawValue * 60
-
-    /// The current state of the timer.
-    @objc dynamic private(set) var state: State = .inFocus
+    @objc dynamic lazy private(set) var iterations = focusMinutes.rawValue * 60
 
     /// The number of pomodoros that have been completed during the day.
     @objc dynamic private(set) var completedPomodoros = 0
+
+    /// The current state of the timer.
+    private(set) var state: State = .inFocus
 
     /// How long, in minutes, the "focus" time is.
     var focusMinutes: FocusMinutes = .twentyFive

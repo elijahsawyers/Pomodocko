@@ -6,6 +6,7 @@
 //
 
 import Cocoa
+import UserNotifications
 
 /// Controls setting the app icon, handling user intents, badging the app icon, and posting notifictations. The "brains" of the app.
 class PomodockoController: NSObject {
@@ -26,17 +27,18 @@ class PomodockoController: NSObject {
         observers = []
         timer = PomodoroTimer()
         super.init()
-        setAppIcon(minutes: timer.minutes, seconds: timer.seconds)
-        setAppBadge(to: timer.completedPomodoros)
+        setAppIconToTimeRemainingInCycle()
+        setAppBadgeToCompletedPomodoros()
 
         // Respond to changes to the number of iterations left in the cycle (break or focus).
         observers.insert(observe(\.timer.iterations) { [unowned self] _, _ in
-            self.setAppIcon(minutes: self.timer.minutes, seconds: self.timer.seconds)
+            if self.timer.iterations == 0 { self.notifyUserThatStateChanged() }
+            self.setAppIconToTimeRemainingInCycle()
         })
 
         // Respond to changes to the number of completed pomodoro cycles.
         observers.insert(observe(\.timer.completedPomodoros) { [unowned self] _, _ in
-            self.setAppBadge(to: self.timer.completedPomodoros)
+            self.setAppBadgeToCompletedPomodoros()
         })
     }
 
@@ -49,19 +51,41 @@ class PomodockoController: NSObject {
     // MARK: - Private Instance Method[s]
 
     /// Change the app's icon to display the minutes and seconds remaining in the pomodoro cycle (focus or break).
-    private func setAppIcon(minutes: Int, seconds: Int) {
+    private func setAppIconToTimeRemainingInCycle() {
         NSApplication.shared.applicationIconImage = AppIconFactory.createIcon(withImagesNamed: [
             "clock",
-            "\(minutes)_minutes",
-            "\(seconds)_seconds",
+            "\(timer.minutes)_minutes",
+            "\(timer.seconds)_seconds",
             "lines_through_digits",
             timer.state == .inFocus ? "focus" : "break"
         ])
     }
 
-    /// Change the app's badge number.
-    private func setAppBadge(to value: Int) {
-        NSApplication.shared.dockTile.badgeLabel = "\(value)"
+    /// Change the app's badge number to the number of completed pomodoros in the day.
+    private func setAppBadgeToCompletedPomodoros() {
+        NSApplication.shared.dockTile.badgeLabel = "\(timer.completedPomodoros)"
+    }
+
+    // Post a notification letting the user know that the state has changed, indicating timer end.
+    private func notifyUserThatStateChanged() {
+        let center = UNUserNotificationCenter.current()
+        let content = UNMutableNotificationContent()
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+
+        if timer.state == .inFocus {
+            content.title = "It's time to take a break!"
+            content.body = "Rest, relax, and step away from your computer for a little bit 😌"
+            content.categoryIdentifier = NotificationCategory.startOfBreak.rawValue
+        } else {
+            content.title = "It's time to focus!"
+            content.body = "Today, you've completed \(timer.completedPomodoros) focus cycle\(timer.completedPomodoros > 1 ? "s" : "")! Keep it going! 🎉"
+            content.categoryIdentifier = NotificationCategory.startOfFocus.rawValue
+        }
+        content.sound = UNNotificationSound.default
+
+        center.add(UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)) { error in
+            // TODO: Handle any thrown errors.
+        }
     }
 
     // MARK: - User Intent[s] (Target-Actions)
@@ -83,6 +107,7 @@ class PomodockoController: NSObject {
     /// Skip the break timer, which reverts the state back to focus mode.
     @objc func skipBreak() {
         timer.reset()
+        timer.start()
     }
 
     /// Update the focus interval, in minutes, based on the menu item selected in the Dock's menu.
