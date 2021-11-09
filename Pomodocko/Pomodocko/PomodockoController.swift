@@ -11,6 +11,19 @@ import UserNotifications
 /// Controls setting the app icon, handling user intents, badging the app icon, and posting notifictations. The "brains" of the app.
 class PomodockoController: NSObject {
 
+    // MARK: - Private Type[s]
+
+    /// A simple data structure to hold all of the needed user default keys.
+    ///
+    /// There are three possible keys - focus minutes, break minutes, and completed pomodoros (for the day).
+    private struct UserDefaultsKeys {
+        static let focusMinutes = "POMODOCKO_FOCUS_MINUTES"
+        static let breakMinutes = "POMODOCKO_BREAK_MINUTES"
+        static var completedPomodoros: String {
+            "POMODOCKO_COMPLETED_POMODOROS_\(Date())"
+        }
+    }
+
     // MARK: - Private Instance Var[s]
 
     /// Stores the observer of changes to the pomodoro timer's iterations and completed pomodoros.
@@ -24,9 +37,23 @@ class PomodockoController: NSObject {
     // MARK: - Initializer[s] and Deinitializer
 
     override init() {
+        // Grab user defaults for focus minutes, break minutes, and the completed pomodoro cycles for the day.
+        let focusMinutes = (UserDefaults.standard.value(forKey: UserDefaultsKeys.focusMinutes) as? Int) ?? 0
+        let breakMinutes = (UserDefaults.standard.value(forKey: UserDefaultsKeys.breakMinutes) as? Int) ?? 0
+        let completedPomodoros = (UserDefaults.standard.value(forKey: UserDefaultsKeys.completedPomodoros) as? Int) ?? 0
+
+        // Set instance var[s].
         observers = []
-        timer = PomodoroTimer()
+        timer = PomodoroTimer(
+            completedPomodoros: completedPomodoros,
+            focusMinutes: PomodoroTimer.FocusMinutes(rawValue: focusMinutes) ?? PomodoroTimer.defaultFocusMinutes,
+            breakMinutes: PomodoroTimer.BreakMinutes(rawValue: breakMinutes) ?? PomodoroTimer.defaultBreakMinutes
+        )
+
+        // Can't forget to call super's init.
         super.init()
+
+        // Set the initial state of the app.
         setAppIconToTimeRemainingInCycle()
         setAppBadgeToCompletedPomodoros()
 
@@ -38,6 +65,7 @@ class PomodockoController: NSObject {
 
         // Respond to changes to the number of completed pomodoro cycles.
         observers.insert(observe(\.timer.completedPomodoros) { [unowned self] _, _ in
+            UserDefaults.standard.set(self.timer.completedPomodoros, forKey: UserDefaultsKeys.completedPomodoros)
             self.setAppBadgeToCompletedPomodoros()
         })
     }
@@ -113,6 +141,7 @@ class PomodockoController: NSObject {
     /// Update the focus interval, in minutes, based on the menu item selected in the Dock's menu.
     @objc func setFocusMinutes(sender: NSMenuItem) {
         guard let focusMinutes = PomodoroTimer.FocusMinutes(rawValue: sender.tag) else { return }
+        UserDefaults.standard.set(focusMinutes.rawValue, forKey: UserDefaultsKeys.focusMinutes)
         timer.focusMinutes = focusMinutes
         timer.reset()
     }
@@ -120,6 +149,7 @@ class PomodockoController: NSObject {
     /// Update the break interval, in minutes, based on the menu item selected in the Dock's menu.
     @objc func setBreakMinutes(sender: NSMenuItem) {
         guard let breakMinutes = PomodoroTimer.BreakMinutes(rawValue: sender.tag) else { return }
+        UserDefaults.standard.set(breakMinutes.rawValue, forKey: UserDefaultsKeys.breakMinutes)
         timer.breakMinutes = breakMinutes
         timer.reset()
     }

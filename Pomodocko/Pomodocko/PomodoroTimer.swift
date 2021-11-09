@@ -33,6 +33,24 @@ class PomodoroTimer: NSObject {
         case five = 5, ten = 10
     }
 
+    // MARK: - Initializer[s]
+
+    override init() { }
+
+    init(completedPomodoros: Int, focusMinutes: FocusMinutes, breakMinutes: BreakMinutes) {
+        self.completedPomodoros = completedPomodoros
+        self.focusMinutes = focusMinutes
+        self.breakMinutes = breakMinutes
+    }
+
+    // MARK: - Public Static Var[s]
+
+    /// Default number of focus minutes.
+    static let defaultFocusMinutes: FocusMinutes = .twentyFive
+
+    /// Default number of break minutes.
+    static let defaultBreakMinutes: BreakMinutes = .five
+
     // MARK: - Private Instance Var[s]
 
     /// Retains a reference to the active timer.
@@ -43,7 +61,7 @@ class PomodoroTimer: NSObject {
     /// How many iterations (seconds) are left in the pomodoro cycle.
     @objc dynamic lazy private(set) var iterations = focusMinutes.rawValue * 60
 
-    /// The number of pomodoros that have been completed during the day.
+    /// The number of pomodoros that have been completed with this timer.
     @objc dynamic private(set) var completedPomodoros = 0
 
     /// The current state of the timer.
