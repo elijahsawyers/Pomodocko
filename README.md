@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="175" src="https://raw.githubusercontent.com/elijahsawyers/Pomodocko/master/Pomodocko.png" />
+  <img width="256" src="https://raw.githubusercontent.com/elijahsawyers/Pomodocko/master/Pomodocko.png" />
 </p>
 <h1 align="center">Pomodocko</h1>
 <p align="center">A Pomodoro Technique timer in your Mac's dock!<p>
